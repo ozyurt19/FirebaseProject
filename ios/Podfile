@@ -10,6 +10,7 @@ production = ENV["PRODUCTION"] == "1"
 target 'FirebaseProject' do
   use_frameworks!
   config = use_native_modules!
+  pod 'RNFBAuth', :path => '../node_modules/@react-native-firebase/auth'
 
   # Flags change depending on the env values.
   flags = get_default_flags()
