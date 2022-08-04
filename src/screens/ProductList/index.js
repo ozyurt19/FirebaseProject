@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Text, View, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import { ScrollView } from 'react-native-gesture-handler';
 const userCollection = firestore().collection('product');
 
 const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
   const [lastDocument, setLastDocument] = useState();
-  const [page, setPage] = useState(-1);
-  const [size, setSize] = useState(0);
 
   function updateProduct(doc) {
     console.log('Product updated!');
@@ -18,24 +17,12 @@ const ProductList = ({ navigation }) => {
   }
 
   function LoadData() {
-    console.log('LOAD');
     let query = userCollection.orderBy('price', 'asc'); //.where('color', 'in', ['Casper', 'red']);
     if (lastDocument !== undefined) {
       query = query.startAfter(lastDocument); // fetch data following the last document accessed
     }
-    if (size === 0) {
-      query.get().then(querySnapshot => {
-        setSize(querySnapshot.size / 3);
-      });
-    }
-    if (page === Math.ceil(size)) {
-      setPage(0);
-    } else {
-      setPage(page + 1);
-    }
-
     query
-      .limit(3)
+      //.limit(3)
       .get()
       .then(querySnapshot => {
         setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -59,67 +46,48 @@ const ProductList = ({ navigation }) => {
     LoadData();
   }
 
-  function LoadData() {
-    console.log('LOAD');
-    let query = userCollection.orderBy('price', 'asc'); //.where('color', 'in', ['Casper', 'red']);
-    if (lastDocument !== undefined) {
-      query = query.startAfter(lastDocument); // fetch data following the last document accessed
-    }
-    if (size === 0) {
-      query.get().then(querySnapshot => {
-        setSize(querySnapshot.size / 3);
-      });
-    }
-    if (page === Math.ceil(size)) {
-      setPage(0);
-    } else {
-      setPage(page + 1);
-    }
-
-    query
-      .limit(3)
-      .get()
-      .then(querySnapshot => {
-        setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        MakeUserData(querySnapshot.docs);
-        //func();
-      });
-  }
-
   function MakeUserData(docs) {
     let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
     docs.forEach((doc, i) => {
       console.log(doc._data);
       let temp = (
-        <View key={i} style={styles.products}>
-          <View>
-            <Text style={{ color: doc._data.color.trim() }}>
+        <View key={i} style={styles.product}>
+          <TouchableOpacity
+            onPress={() => {
+              updateProduct(doc);
+            }}>
+            <Image
+              style={styles.imgStyle}
+              source={{
+                uri: doc._data.imgUrl,
+              }}
+            />
+            <Text>
               {doc._data.brand} {doc._data.name} {doc._data.color}
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                updateProduct(doc);
-              }}>
-              <View style={styles.reverseButton} />
-            </TouchableOpacity>
-          </View>
-          <Text>Price: {doc._data.price}</Text>
+          </TouchableOpacity>
+          <Text>{doc._data.price} TRY</Text>
         </View>
       );
       templist.push(temp);
     });
     setUserData(templist); //replace with the new data
   }
+
   return (
     <View style={styles.main}>
-      {userData}
-      <Text>page: {page + 1}</Text>
-      <Button
-        onPress={() => {
-          LoadData();
-        }}
-        title="Load Next"
-      />
+      <ScrollView>
+        <View style={styles.products}>{userData}</View>
+      </ScrollView>
+      <View>
+        <TouchableOpacity
+          style={styles.touchableOpacity}
+          onPress={() => {
+            LoadData();
+          }}>
+          <Text style={styles.touchableOpacityText}>Load Products</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -127,29 +95,45 @@ const ProductList = ({ navigation }) => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    marginTop: 100,
+    paddingTop: 50,
     paddingHorizontal: 24,
+    paddingBottom: 50,
+    backgroundColor: '#E1E8ED',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  product: {
+    padding: 8,
+    height: '27%',
+    margin: 3,
+    width: '46%',
+    backgroundColor: '#AAB8C2',
+    borderRadius: 10,
   },
   products: {
-    margin: 10,
+    height: '70%',
+    flexDirection: 'row',
+
+    flexWrap: 'wrap',
   },
-  reverseButton: {
-    width: '3%',
+  touchableOpacity: {
+    width: '45%',
+    alignItems: 'center',
+    alignContent: 'center',
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#14171A',
+    marginTop: 15,
+  },
+  touchableOpacityText: {
+    color: 'white',
+    fontSize: 17,
+    padding: 15,
+  },
+  imgStyle: {
+    width: '80%',
     aspectRatio: 1,
-    backgroundColor: 'black',
-    borderRadius: 4,
+    alignSelf: 'center',
   },
 });
 export default ProductList;
+//style={{ color: doc._data.color.trim() }}

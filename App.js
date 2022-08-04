@@ -1,4 +1,4 @@
-import * as React from 'react'; //sayfalara bolmek, drawer navigation, functionları ve firebase olayin data kisminda tutmak, tasarimi guzellestirmek
+import * as React from 'react'; //functionları ve firebase olayin data kisminda tutmak, suna gore sirala kismi, tasarimi guzellestirmek
 /*https://invertase.io/blog/getting-started-with-cloud-firestore-on-react-native */
 import { NavigationContainer } from '@react-navigation/native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,8 +7,6 @@ import ProductList from './src/screens/ProductList';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const { Screen, Navigator } = createDrawerNavigator();
-
-//const { Screen, Navigator } = createNativeStackNavigator();
 
 const App = () => {
   return (
