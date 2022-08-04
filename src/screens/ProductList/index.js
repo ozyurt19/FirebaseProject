@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'; //sayfalara bolmek, drawer navigation, functionları ve firebase olayin data kisminda tutmak
-import { Text, View, Button, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const userCollection = firestore().collection('product');
 
@@ -8,7 +8,6 @@ const ProductList = ({ navigation }) => {
   const [lastDocument, setLastDocument] = useState();
   const [page, setPage] = useState(-1);
   const [size, setSize] = useState(0);
-  const [todo, setTodo] = useState('determine brand, name, color, price!');
 
   function updateProduct(doc) {
     console.log('Product updated!');
@@ -60,29 +59,6 @@ const ProductList = ({ navigation }) => {
     LoadData();
   }
 
-  function MakeUserData(docs) {
-    let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
-    docs.forEach((doc, i) => {
-      console.log(doc._data);
-      let temp = (
-        <View key={i} style={{ margin: 10 }}>
-          <Button
-            title="Reverse brand name"
-            onPress={() => {
-              updateProduct(doc);
-            }}
-          />
-          <Text style={{ color: doc._data.color.trim() }}>
-            {doc._data.brand} {doc._data.name} {doc._data.color}
-          </Text>
-          <Text>Price: {doc._data.price}</Text>
-        </View>
-      );
-      templist.push(temp);
-    });
-    setUserData(templist); //replace with the new data
-  }
-
   function LoadData() {
     console.log('LOAD');
     let query = userCollection.orderBy('price', 'asc'); //.where('color', 'in', ['Casper', 'red']);
@@ -109,6 +85,31 @@ const ProductList = ({ navigation }) => {
         //func();
       });
   }
+
+  function MakeUserData(docs) {
+    let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
+    docs.forEach((doc, i) => {
+      console.log(doc._data);
+      let temp = (
+        <View key={i} style={styles.products}>
+          <View>
+            <Text style={{ color: doc._data.color.trim() }}>
+              {doc._data.brand} {doc._data.name} {doc._data.color}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                updateProduct(doc);
+              }}>
+              <View style={styles.reverseButton} />
+            </TouchableOpacity>
+          </View>
+          <Text>Price: {doc._data.price}</Text>
+        </View>
+      );
+      templist.push(temp);
+    });
+    setUserData(templist); //replace with the new data
+  }
   return (
     <View style={styles.main}>
       {userData}
@@ -119,21 +120,13 @@ const ProductList = ({ navigation }) => {
         }}
         title="Load Next"
       />
-      <Button
-        title="Go to Add Product Page"
-        onPress={() =>
-          navigation.navigate('AddProduct', {
-            setTodo: setTodo,
-            todo: todo,
-          })
-        }
-      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   main: {
+    flex: 1,
     marginTop: 100,
     paddingHorizontal: 24,
   },
@@ -148,6 +141,15 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  products: {
+    margin: 10,
+  },
+  reverseButton: {
+    width: '3%',
+    aspectRatio: 1,
+    backgroundColor: 'black',
+    borderRadius: 4,
   },
 });
 export default ProductList;

@@ -1,23 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Button, StyleSheet, TextInput } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const userCollection = firestore().collection('product');
 
 const AddProduct = props => {
+  const [todo, setTodo] = useState('determine brand, name, color, price!');
   return (
     <View style={styles.main}>
-      <TextInput
-        label={'New Todo'}
-        onChangeText={props.route.params.setTodo}
-        value={props.route.params.todo}
-      />
+      <TextInput label={'New Todo'} onChangeText={setTodo} value={todo} />
       <Button
         onPress={() => {
           userCollection.add({
-            brand: [...props.route.params.todo.split(',')][0],
-            name: [...props.route.params.todo.split(',')][1],
-            color: [...props.route.params.todo.split(',')][2],
-            price: parseInt([...props.route.params.todo.split(',')][3], 10),
+            brand: [...todo.split(',')][0],
+            name: [...todo.split(',')][1],
+            color: [...todo.split(',')][2],
+            price: parseInt([...todo.split(',')][3], 10),
           });
         }}
         title="Add a Product"
@@ -28,6 +25,7 @@ const AddProduct = props => {
 
 const styles = StyleSheet.create({
   main: {
+    flex: 1,
     marginTop: 100,
     paddingHorizontal: 24,
   },
