@@ -9,16 +9,8 @@ const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
   const [lastDocument, setLastDocument] = useState();
 
-  function updateProduct(doc) {
-    console.log('Product updated!');
-    userCollection.doc(doc.id).update({
-      brand: reverseString(doc._data.brand),
-    });
-    LoadData();
-  }
-
-  function LoadData() {
-    let query = userCollection.orderBy('price', 'asc'); //.where('color', 'in', ['Casper', 'red']);
+  function LoadData(order = 'asc') {
+    let query = userCollection.orderBy('price', order); //.where('color', 'in', ['Casper', 'red']);
     if (lastDocument !== undefined) {
       query = query.startAfter(lastDocument); // fetch data following the last document accessed
     }
@@ -44,7 +36,7 @@ const ProductList = ({ navigation }) => {
     userCollection.doc(doc.id).update({
       brand: reverseString(doc._data.brand),
     });
-    LoadData();
+    LoadData(value);
   }
 
   function MakeUserData(docs) {
@@ -85,11 +77,9 @@ const ProductList = ({ navigation }) => {
   return (
     <View style={styles.main}>
       <DropDownPicker
-        containerStyle={{
-          width: '48%',
-          alignSelf: 'flex-end',
-          paddingBottom: 20,
-        }}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{ backgroundColor: '#E1E8ED' }}
+        containerStyle={styles.dropDown}
         open={open}
         value={value}
         items={items}
@@ -104,7 +94,7 @@ const ProductList = ({ navigation }) => {
         <TouchableOpacity
           style={styles.touchableOpacity}
           onPress={() => {
-            LoadData();
+            LoadData(value);
           }}>
           <Text style={styles.touchableOpacityText}>Load Products</Text>
         </TouchableOpacity>
@@ -119,14 +109,14 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 24,
     paddingBottom: 50,
-    backgroundColor: '#E1E8ED',
+    backgroundColor: '#F5F8FA',
   },
   product: {
     padding: 8,
     height: '27%',
     margin: 3,
     width: '46%',
-    backgroundColor: '#AAB8C2',
+    backgroundColor: '#E1E8ED',
     borderRadius: 10,
   },
   products: {
@@ -142,7 +132,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: '#14171A',
+    backgroundColor: '#657786',
     marginTop: 15,
   },
   touchableOpacityText: {
@@ -154,6 +144,11 @@ const styles = StyleSheet.create({
     width: '80%',
     aspectRatio: 1,
     alignSelf: 'center',
+  },
+  dropDown: {
+    width: '48%',
+    alignSelf: 'flex-end',
+    paddingBottom: 20,
   },
 });
 export default ProductList;
