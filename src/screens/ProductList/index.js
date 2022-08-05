@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; //dropdown
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 const userCollection = firestore().collection('product');
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -74,8 +75,28 @@ const ProductList = ({ navigation }) => {
     setUserData(templist); //replace with the new data
   }
 
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('asc');
+  const [items, setItems] = useState([
+    { label: 'Increasing order', value: 'asc' },
+    { label: 'Decreasing order', value: 'desc' },
+  ]);
+
   return (
     <View style={styles.main}>
+      <DropDownPicker
+        containerStyle={{
+          width: '48%',
+          alignSelf: 'flex-end',
+          paddingBottom: 20,
+        }}
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        setItems={setItems}
+      />
       <ScrollView>
         <View style={styles.products}>{userData}</View>
       </ScrollView>
@@ -95,7 +116,7 @@ const ProductList = ({ navigation }) => {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 20,
     paddingHorizontal: 24,
     paddingBottom: 50,
     backgroundColor: '#E1E8ED',
