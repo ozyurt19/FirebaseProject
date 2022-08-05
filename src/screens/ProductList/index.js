@@ -17,7 +17,7 @@ const ProductList = ({ navigation }) => {
   ]);
 
   useEffect(() => {
-    LoadData(value);
+    LoadData();
   }, [LoadData, value]);
 
   function reverseString(str) {
@@ -27,40 +27,36 @@ const ProductList = ({ navigation }) => {
     return joinArray;
   }
 
-  const LoadData = useCallback(
-    (order = 'asc') => {
-      let query = userCollection.orderBy('price', order); //.where('color', 'in', ['Casper', 'red']);
-      if (lastDocument !== undefined) {
-        query = query.startAfter(lastDocument); // fetch data following the last document accessed
-      }
-      query
-        //.limit(3)
-        .get()
-        .then(querySnapshot => {
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length]);
-          MakeUserData(querySnapshot.docs);
-          //func();
-        });
-    },
-    [MakeUserData, lastDocument],
-  );
+  const LoadData = useCallback(() => {
+    let query = userCollection.orderBy('price', value); //.where('color', 'in', ['Casper', 'red']);
+    if (lastDocument !== undefined) {
+      query = query.startAfter(lastDocument); // fetch data following the last document accessed
+    }
+    query
+      //.limit(3)
+      .get()
+      .then(querySnapshot => {
+        setLastDocument(querySnapshot.docs[querySnapshot.docs.length]);
+        MakeUserData(querySnapshot.docs);
+        //func();
+      });
+  }, [MakeUserData, lastDocument, value]);
 
   const updateProduct = useCallback(
     doc => {
-      console.log('Product updated!');
       userCollection.doc(doc.id).update({
         brand: reverseString(doc._data.brand),
       });
-      LoadData(value);
+      LoadData();
     },
-    [LoadData, value],
+    [LoadData],
   );
 
   const MakeUserData = useCallback(
     docs => {
       let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
       docs.forEach((doc, i) => {
-        console.log(doc._data);
+        //console.log(doc._data);
         let temp = (
           <View key={i} style={styles.product}>
             <TouchableOpacity
@@ -91,7 +87,7 @@ const ProductList = ({ navigation }) => {
     <View style={styles.main}>
       <DropDownPicker
         // eslint-disable-next-line react-native/no-inline-styles
-        style={{ backgroundColor: '#E1E8ED' }}
+        style={{ backgroundColor: '#E1E8ED', borderWidth: 0 }}
         containerStyle={styles.dropDown}
         open={open}
         value={value}
@@ -99,6 +95,8 @@ const ProductList = ({ navigation }) => {
         setOpen={setOpen}
         setValue={setValue}
         setItems={setItems}
+        // eslint-disable-next-line react-native/no-inline-styles
+        dropDownContainerStyle={{ borderWidth: 0 }}
       />
       <ScrollView>
         <View style={styles.products}>{userData}</View>
@@ -111,32 +109,34 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     paddingTop: 10,
-    paddingHorizontal: 24,
+    paddingHorizontal: 14,
     paddingBottom: 70,
     backgroundColor: '#F5F8FA',
   },
   product: {
-    padding: 8,
-    height: '32%',
+    paddingHorizontal: 8,
+    paddingBottom: 5,
+    height: '27%',
     margin: 3,
-    width: '46%',
+    width: '48%',
     backgroundColor: '#E1E8ED',
-    borderRadius: 10,
+    borderRadius: 2,
   },
   products: {
-    height: '60%',
+    height: '61%',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   imgStyle: {
-    width: '80%',
+    width: '110%',
     aspectRatio: 1,
     alignSelf: 'center',
   },
   dropDown: {
-    width: '48%',
+    width: '60%',
     alignSelf: 'flex-end',
     paddingBottom: 10,
+    borderWidth: 0,
   },
 });
 export default ProductList;

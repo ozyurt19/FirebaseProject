@@ -1,4 +1,5 @@
-import * as React from 'react'; //functionları ve firebase olayin data kisminda tutmak, suna gore sirala kismi, tasarimi guzellestirmek
+import * as React from 'react'; //addproducttan update edildiğinde auto render, colori dropdown yapma,
+//functionları ve firebase olayin data kisminda tutmak
 /*https://invertase.io/blog/getting-started-with-cloud-firestore-on-react-native */
 import { NavigationContainer } from '@react-navigation/native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,7 +12,13 @@ const { Screen, Navigator } = createDrawerNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      <Navigator useLegacyImplementation={true}>
+      <Navigator
+        screenOptions={{
+          drawerActiveBackgroundColor: '#AAB8C2',
+          drawerActiveTintColor: 'white',
+          drawerInactiveTintColor: '#657786',
+        }}
+        useLegacyImplementation={true}>
         <Screen name="ProductList" component={ProductList} />
         <Screen name="AddProduct" component={AddProduct} />
       </Navigator>

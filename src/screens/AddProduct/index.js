@@ -1,13 +1,180 @@
-import React, { useState } from 'react';
-import { View, Button, StyleSheet, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Button, StyleSheet, TextInput, Text } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const userCollection = firestore().collection('product');
+import { useForm, Controller } from 'react-hook-form';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddProduct = props => {
-  const [todo, setTodo] = useState('determine brand, name, color, price!');
+  const [open, setOpen] = useState(false);
+  const [valuea, setValue] = useState('red');
+  const [items, setItems] = useState([
+    { label: 'Red', valuea: 'red' },
+    { label: 'Blue', valuea: 'blue' },
+  ]);
+  const {
+    //register,
+    //setValue,
+    handleSubmit,
+    control,
+    reset,
+    //formState: { errors },
+  } = useForm();
+
+  const onSubmit = data => {
+    console.log(data);
+    userCollection.add({
+      brand: data.brand,
+      name: data.name,
+      color: data.color,
+      price: parseInt(data.price, 10),
+      imgUrl: data.imgUrl,
+    });
+    alert('Product has been added.');
+  };
   return (
     <View style={styles.main}>
-      <TextInput label={'New Todo'} onChangeText={setTodo} value={todo} />
+      <Text style={styles.label}>Brand</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="eg. 'Apple'"
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={value => onChange(value)}
+            value={value}
+          />
+        )}
+        name="brand"
+        rules={{ required: true }}
+      />
+      <Text style={styles.label}>Name of your Product</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="eg. 'iPhone'"
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={value => onChange(value)}
+            value={value}
+          />
+        )}
+        name="name"
+        rules={{ required: true }}
+      />
+      <Text style={styles.label}>Color</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="color of product"
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={value => onChange(value)}
+            value={value}
+          />
+        )}
+        name="color"
+        rules={{ required: true }}
+      />
+      <Text style={styles.label}>Price</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            textContentType="password"
+            placeholder="price in TRY"
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={value => onChange(value)}
+            value={value}
+          />
+        )}
+        name="price"
+        rules={{ required: true }}
+      />
+      <Text style={styles.label}>Image</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            textContentType="URL"
+            placeholder="enter a image url here"
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={value => onChange(value)}
+            value={value}
+          />
+        )}
+        name="imgUrl"
+        rules={{ required: true }}
+      />
+
+      <View style={styles.button}>
+        <Button
+          style={styles.buttonInner}
+          color
+          title="Reset"
+          onPress={() => {
+            reset({
+              brand: '',
+              name: '',
+              color: '',
+              price: '',
+            });
+          }}
+        />
+      </View>
+
+      <View style={styles.button}>
+        <Button
+          style={styles.buttonInner}
+          color
+          title="Add Product"
+          onPress={handleSubmit(onSubmit)}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    marginTop: 40,
+    paddingHorizontal: 24,
+  },
+  label: {
+    color: 'black',
+    margin: 20,
+    marginLeft: 0,
+  },
+  button: {
+    marginTop: 40,
+    color: 'white',
+    height: 40,
+    backgroundColor: '#AAB8C2',
+    borderRadius: 4,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 8,
+    backgroundColor: '#0e101c',
+  },
+  input: {
+    backgroundColor: 'white',
+    borderColor: 'none',
+    height: 40,
+    padding: 10,
+    borderRadius: 4,
+  },
+});
+export default AddProduct;
+/*
+<TextInput label={'New Todo'} onChangeText={setTodo} value={todo} />
       <Button
         onPress={() => {
           userCollection.add({
@@ -19,27 +186,4 @@ const AddProduct = props => {
         }}
         title="Add a Product"
       />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-    marginTop: 100,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-export default AddProduct;
+*/
