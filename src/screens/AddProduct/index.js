@@ -7,10 +7,13 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddProduct = props => {
   const [open, setOpen] = useState(false);
-  //const [value] = useState('red');
   const [items, setItems] = useState([
     { label: 'Red', value: 'red' },
     { label: 'Blue', value: 'blue' },
+    { label: 'Green', value: 'green' },
+    { label: 'Black', value: 'black' },
+    { label: 'White', value: 'white' },
+    { label: 'Gold', value: 'gold' },
   ]);
   const {
     //register,
@@ -32,6 +35,12 @@ const AddProduct = props => {
     });
     // eslint-disable-next-line no-alert
     alert('Product has been added.');
+    reset({
+      brand: '',
+      name: '',
+      color: '',
+      price: '',
+    });
   };
   return (
     <View style={styles.main}>
@@ -128,8 +137,9 @@ const AddProduct = props => {
             reset({
               brand: '',
               name: '',
-              color: '',
+              color: 'Select an item',
               price: '',
+              imgUrl: '',
             });
           }}
         />

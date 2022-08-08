@@ -116,14 +116,12 @@ const styles = StyleSheet.create({
   product: {
     paddingHorizontal: 8,
     paddingBottom: 5,
-    height: '27%',
     margin: 3,
     width: '48%',
     backgroundColor: '#E1E8ED',
     borderRadius: 2,
   },
   products: {
-    height: '61%',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
@@ -157,4 +155,4 @@ export default ProductList;
     fontSize: 17,
     padding: 15,
   },
-  */
+*/
