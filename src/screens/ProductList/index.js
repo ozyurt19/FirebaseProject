@@ -1,16 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Modal,
+  Pressable,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 const userCollection = firestore().collection('product');
 import DropDownPicker from 'react-native-dropdown-picker';
-//import OptionsMenu from 'react-native-option-menu';
-//const MoreIcon = require('../../../more.png');
 
 const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
   const [lastDocument, setLastDocument] = useState();
-
+  const [productNum, setProductNum] = useState(0);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('asc');
   const [items, setItems] = useState([
@@ -72,6 +78,7 @@ const ProductList = ({ navigation }) => {
     },
     [LoadData],
   );
+  const [modalVisible, setModalVisible] = useState(false);
 
   const MakeUserData = useCallback(
     docs => {
@@ -82,10 +89,11 @@ const ProductList = ({ navigation }) => {
           <View key={i} style={styles.product}>
             <TouchableOpacity
               onLongPress={() => {
-                deleteProduct(doc);
+                reverseProductName(doc);
               }}
               onPress={() => {
-                reverseProductName(doc);
+                //setModalVisible(true);
+                console.log('Go to details page.');
               }}>
               <Image
                 style={styles.imgStyle}
@@ -97,6 +105,23 @@ const ProductList = ({ navigation }) => {
                 {doc._data.brand} {doc._data.name} {doc._data.color}
               </Text>
             </TouchableOpacity>
+            <Pressable
+              style={[styles.button, styles.buttonOpen]}
+              onPress={() => {
+                setProductNum(i);
+                setModalVisible(true);
+              }}>
+              <Text
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                ...
+              </Text>
+            </Pressable>
             <Text>{doc._data.price} TRY</Text>
           </View>
         );
@@ -104,7 +129,7 @@ const ProductList = ({ navigation }) => {
       });
       setUserData(templist); //replace with the new data
     },
-    [deleteProduct, reverseProductName],
+    [reverseProductName],
   );
 
   return (
@@ -125,6 +150,39 @@ const ProductList = ({ navigation }) => {
       <ScrollView>
         <View style={styles.products}>{userData}</View>
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                userCollection
+                  .orderBy('price', value)
+                  .get()
+                  .then(querySnapshot => {
+                    deleteProduct(querySnapshot.docs[productNum]);
+                  });
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={styles.textStyle}>Delete Product</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}>
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -159,6 +217,53 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     paddingBottom: 10,
     borderWidth: 0,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    marginTop: 570,
+    backgroundColor: '#E1E8ED',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'flex-end',
+    shadowColor: '#14171A',
+    shadowOffset: {
+      width: 2,
+      height: 4,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 3,
+    padding: 2,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#14171A',
+    borderRadius: 3,
+    padding: 2,
+    width: '16%',
+    alignSelf: 'flex-end',
+  },
+  buttonClose: {
+    backgroundColor: '#657786',
+    margin: 15,
+  },
+  textStyle: {
+    color: 'white',
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
 export default ProductList;
