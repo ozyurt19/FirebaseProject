@@ -17,8 +17,13 @@ const ProductList = ({ navigation }) => {
   ]);
 
   useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      LoadData();
+      //console.log('feed is focused');
+    });
     LoadData();
-  }, [LoadData, value]);
+    return unsubscribe;
+  }, [LoadData, navigation, value]);
 
   function reverseString(str) {
     var splitString = str.split('');
@@ -47,6 +52,26 @@ const ProductList = ({ navigation }) => {
       userCollection.doc(doc.id).update({
         brand: reverseString(doc._data.brand),
       });
+      //userCollection
+      //  .doc(doc.id)
+      //  .delete()
+      //  .then(() => {
+      //    console.log('User deleted!');
+      //  });
+      LoadData();
+    },
+    [LoadData],
+  );
+
+  const deleteProduct = useCallback(
+    doc => {
+      userCollection
+        .doc(doc.id)
+        .delete()
+        .then(() => {
+          // eslint-disable-next-line no-alert
+          alert('Product deleted!');
+        });
       LoadData();
     },
     [LoadData],
@@ -60,6 +85,9 @@ const ProductList = ({ navigation }) => {
         let temp = (
           <View key={i} style={styles.product}>
             <TouchableOpacity
+              onLongPress={() => {
+                deleteProduct(doc);
+              }}
               onPress={() => {
                 updateProduct(doc);
               }}>
@@ -80,7 +108,7 @@ const ProductList = ({ navigation }) => {
       });
       setUserData(templist); //replace with the new data
     },
-    [updateProduct],
+    [deleteProduct, updateProduct],
   );
 
   return (

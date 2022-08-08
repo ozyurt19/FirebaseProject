@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import { View, Button, StyleSheet, TextInput, Text } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const userCollection = firestore().collection('product');
+const labelsAndColors = firestore().collection('labels-and-colors');
 import { useForm, Controller } from 'react-hook-form';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const AddProduct = props => {
+const AddProduct = ({ navigation }) => {
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState([
-    { label: 'Red', value: 'red' },
-    { label: 'Blue', value: 'blue' },
-    { label: 'Green', value: 'green' },
-    { label: 'Black', value: 'black' },
-    { label: 'White', value: 'white' },
-    { label: 'Gold', value: 'gold' },
-  ]);
+  const [items, setItems] = useState([]);
+
+  labelsAndColors.get().then(querySnapshot => {
+    const tmp = [];
+    querySnapshot.forEach(item => {
+      tmp.push(item._data);
+    });
+    setItems(tmp);
+  });
+
   const {
     //register,
     //setValue,
@@ -25,7 +28,7 @@ const AddProduct = props => {
   } = useForm();
 
   const onSubmit = data => {
-    console.log(data);
+    //console.log(data);
     userCollection.add({
       brand: data.brand,
       name: data.name,
@@ -38,8 +41,9 @@ const AddProduct = props => {
     reset({
       brand: '',
       name: '',
-      color: '',
+      color: 'Select an item',
       price: '',
+      imgUrl: '',
     });
   };
   return (
