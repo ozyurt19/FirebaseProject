@@ -6,7 +6,7 @@ const labelsAndColors = firestore().collection('labels-and-colors');
 import { useForm, Controller } from 'react-hook-form';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-const AddProduct = ({ navigation }) => {
+const AddProduct = props => {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
 

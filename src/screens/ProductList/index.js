@@ -4,6 +4,8 @@ import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 const userCollection = firestore().collection('product');
 import DropDownPicker from 'react-native-dropdown-picker';
+//import OptionsMenu from 'react-native-option-menu';
+//const MoreIcon = require('../../../more.png');
 
 const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -47,17 +49,11 @@ const ProductList = ({ navigation }) => {
       });
   }, [MakeUserData, lastDocument, value]);
 
-  const updateProduct = useCallback(
+  const reverseProductName = useCallback(
     doc => {
       userCollection.doc(doc.id).update({
         brand: reverseString(doc._data.brand),
       });
-      //userCollection
-      //  .doc(doc.id)
-      //  .delete()
-      //  .then(() => {
-      //    console.log('User deleted!');
-      //  });
       LoadData();
     },
     [LoadData],
@@ -89,7 +85,7 @@ const ProductList = ({ navigation }) => {
                 deleteProduct(doc);
               }}
               onPress={() => {
-                updateProduct(doc);
+                reverseProductName(doc);
               }}>
               <Image
                 style={styles.imgStyle}
@@ -108,7 +104,7 @@ const ProductList = ({ navigation }) => {
       });
       setUserData(templist); //replace with the new data
     },
-    [deleteProduct, updateProduct],
+    [deleteProduct, reverseProductName],
   );
 
   return (
