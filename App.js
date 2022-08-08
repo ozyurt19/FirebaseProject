@@ -1,5 +1,4 @@
-import * as React from 'react'; //addproducttan update edildiğinde auto render, colori dropdown yapma,
-//functionları ve firebase olayin data kisminda tutmak
+import * as React from 'react'; //addproducttan update edildiğinde auto render, functionları ve firebase olayin data kisminda tutmak
 /*https://invertase.io/blog/getting-started-with-cloud-firestore-on-react-native */
 import { NavigationContainer } from '@react-navigation/native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';

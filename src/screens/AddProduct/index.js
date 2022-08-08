@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Button, StyleSheet, TextInput, Text } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const userCollection = firestore().collection('product');
@@ -7,10 +7,10 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 const AddProduct = props => {
   const [open, setOpen] = useState(false);
-  const [valuea, setValue] = useState('red');
+  //const [value] = useState('red');
   const [items, setItems] = useState([
-    { label: 'Red', valuea: 'red' },
-    { label: 'Blue', valuea: 'blue' },
+    { label: 'Red', value: 'red' },
+    { label: 'Blue', value: 'blue' },
   ]);
   const {
     //register,
@@ -30,6 +30,7 @@ const AddProduct = props => {
       price: parseInt(data.price, 10),
       imgUrl: data.imgUrl,
     });
+    // eslint-disable-next-line no-alert
     alert('Product has been added.');
   };
   return (
@@ -42,7 +43,7 @@ const AddProduct = props => {
             placeholder="eg. 'Apple'"
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={value => onChange(value)}
+            onChangeText={valuea => onChange(valuea)}
             value={value}
           />
         )}
@@ -57,7 +58,7 @@ const AddProduct = props => {
             placeholder="eg. 'iPhone'"
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={value => onChange(value)}
+            onChangeText={valuea => onChange(valuea)}
             value={value}
           />
         )}
@@ -67,13 +68,19 @@ const AddProduct = props => {
       <Text style={styles.label}>Color</Text>
       <Controller
         control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            placeholder="color of product"
-            style={styles.input}
-            onBlur={onBlur}
-            onChangeText={value => onChange(value)}
-            value={value}
+        render={({ field }) => (
+          <DropDownPicker
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ backgroundColor: '#E1E8ED', borderWidth: 0 }}
+            containerStyle={styles.dropDown}
+            open={open}
+            value={field.value}
+            items={items}
+            setOpen={setOpen}
+            setValue={callback => field.onChange(callback())}
+            setItems={setItems}
+            // eslint-disable-next-line react-native/no-inline-styles
+            dropDownContainerStyle={{ borderWidth: 0 }}
           />
         )}
         name="color"
@@ -88,7 +95,7 @@ const AddProduct = props => {
             placeholder="price in TRY"
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={value => onChange(value)}
+            onChangeText={valuea => onChange(valuea)}
             value={value}
           />
         )}
@@ -104,7 +111,7 @@ const AddProduct = props => {
             placeholder="enter a image url here"
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={value => onChange(value)}
+            onChangeText={valuea => onChange(valuea)}
             value={value}
           />
         )}

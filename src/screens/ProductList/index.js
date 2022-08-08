@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'; //dropdown
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
