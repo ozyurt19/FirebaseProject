@@ -28,7 +28,6 @@ const AddProduct = props => {
   } = useForm();
 
   const onSubmit = data => {
-    console.log('deneme');
     userCollection.add({
       brand: data.brand,
       name: data.name,

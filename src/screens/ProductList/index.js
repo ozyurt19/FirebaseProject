@@ -8,16 +8,21 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+
 import { ScrollView } from 'react-native-gesture-handler';
-const userCollection = firestore().collection('product');
 import DropDownPicker from 'react-native-dropdown-picker';
-//import LoadData from '../../../data/product';
+import {
+  deleteProduct,
+  reverseProductName,
+  LoadData,
+} from '../../utils/productUtil';
 
 const ProductList = ({ navigation }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+  const [lastDocument, setLastDocument] = useState();
   const [userData, setUserData] = useState([]);
   const [userData2, setUserData2] = useState('');
-  const [lastDocument, setLastDocument] = useState();
   const [productNum, setProductNum] = useState(0);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('asc');
@@ -26,115 +31,80 @@ const ProductList = ({ navigation }) => {
     { label: 'Decreasing order of price', value: 'desc' },
   ]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      LoadData();
-      //console.log('feed is focused');
-    });
-    LoadData();
-    return unsubscribe;
-  }, [LoadData, navigation, value]);
-
-  function reverseString(str) {
-    var splitString = str.split('');
-    var reverseArray = splitString.reverse();
-    var joinArray = reverseArray.join('');
-    return joinArray;
-  }
-
-  const reverseProductName = useCallback(
-    doc => {
-      userCollection.doc(doc.id).update({
-        brand: reverseString(doc._data.brand),
-      });
-      LoadData();
-    },
-    [LoadData],
-  );
-
-  const deleteProduct = useCallback(
-    doc => {
-      userCollection
-        .doc(doc.id)
-        .delete()
-        .then(() => {
-          // eslint-disable-next-line no-alert
-          alert('Product deleted!');
-        });
-      LoadData();
-    },
-    [LoadData],
-  );
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modal2Visible, setModal2Visible] = useState(false);
-
-  const LoadData = useCallback(() => {
-    let query = userCollection.orderBy('price', value); //.where('color', 'in', ['Casper', 'red']);
-    if (lastDocument !== undefined) {
-      query = query.startAfter(lastDocument); // fetch data following the last document accessed
-    }
-    query
-      //.limit(3)
-      .get()
-      .then(querySnapshot => {
-        setLastDocument(querySnapshot.docs[querySnapshot.docs.length]);
-        MakeUserData(querySnapshot.docs);
-        //func();
-      });
+  const load = useCallback(async () => {
+    const { last, docs } = await LoadData(value, lastDocument);
+    setLastDocument(last);
+    MakeUserData(docs);
   }, [MakeUserData, lastDocument, value]);
 
-  const MakeUserData = useCallback(
-    docs => {
-      let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
-      docs.forEach((doc, i) => {
-        //console.log(doc._data);
-        let temp = (
-          <View key={i} style={styles.product}>
-            <TouchableOpacity
-              onLongPress={() => {
-                reverseProductName(doc);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const { last, docs } = await LoadData(value, lastDocument);
+      setLastDocument(last);
+      MakeUserData(docs);
+    });
+    load();
+    return unsubscribe;
+  }, [MakeUserData, lastDocument, load, navigation, value, userData]);
+
+  const MakeUserData = useCallback(docs => {
+    let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
+    docs.forEach((doc, i) => {
+      if (!doc) {
+        return null;
+      }
+      let temp = (
+        <View key={i} style={styles.product}>
+          <TouchableOpacity
+            onLongPress={() => reverseProductName(doc)}
+            onPress={() => {
+              setProductNum(i);
+              setModal2Visible(true);
+              setUserData2(doc._data.description);
+            }}>
+            <Image
+              style={styles.imgStyle}
+              source={{
+                uri: doc._data.imgUrl,
               }}
-              onPress={() => {
-                setProductNum(i);
-                setModal2Visible(true);
-                setUserData2(doc._data.description);
+            />
+            <Text>
+              {doc._data.brand} {doc._data.name} {doc._data.color}
+            </Text>
+          </TouchableOpacity>
+          <Pressable
+            style={[styles.button, styles.buttonOpen]}
+            onPress={() => {
+              setProductNum(i);
+              setModalVisible(true);
+            }}>
+            <Text
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                color: 'white',
+                fontSize: 12,
+                fontWeight: 'bold',
+                textAlign: 'center',
               }}>
-              <Image
-                style={styles.imgStyle}
-                source={{
-                  uri: doc._data.imgUrl,
-                }}
-              />
-              <Text>
-                {doc._data.brand} {doc._data.name} {doc._data.color}
-              </Text>
-            </TouchableOpacity>
-            <Pressable
-              style={[styles.button, styles.buttonOpen]}
-              onPress={() => {
-                setProductNum(i);
-                setModalVisible(true);
-              }}>
-              <Text
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{
-                  color: 'white',
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                ...
-              </Text>
-            </Pressable>
-            <Text>{doc._data.price} TRY</Text>
-          </View>
-        );
-        templist.push(temp);
-      });
-      setUserData(templist); //replace with the new data
-    },
-    [reverseProductName],
-  );
+              ...
+            </Text>
+          </Pressable>
+          <Text>{doc._data.price} TRY</Text>
+        </View>
+      );
+      templist.push(temp);
+    });
+    setUserData(templist); //replace with the new data
+  }, []);
+
+  const onPressDeleteProduct = async () => {
+    await deleteProduct(productNum, value);
+    const { last, docs } = await LoadData(value, lastDocument);
+    setLastDocument(last);
+    MakeUserData(docs);
+
+    setModalVisible(!modalVisible);
+  };
 
   return (
     <View style={styles.main}>
@@ -154,6 +124,7 @@ const ProductList = ({ navigation }) => {
       <ScrollView>
         <View style={styles.products}>{userData}</View>
       </ScrollView>
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -190,15 +161,7 @@ const ProductList = ({ navigation }) => {
           <View style={styles.modalView}>
             <Pressable
               style={[styles.button, styles.buttonClose]}
-              onPress={() => {
-                userCollection
-                  .orderBy('price', value)
-                  .get()
-                  .then(querySnapshot => {
-                    deleteProduct(querySnapshot.docs[productNum]);
-                  });
-                setModalVisible(!modalVisible);
-              }}>
+              onPress={onPressDeleteProduct}>
               <Text style={styles.textStyle}>Delete Product</Text>
             </Pressable>
             <Pressable
