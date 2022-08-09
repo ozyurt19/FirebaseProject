@@ -12,9 +12,11 @@ import firestore from '@react-native-firebase/firestore';
 import { ScrollView } from 'react-native-gesture-handler';
 const userCollection = firestore().collection('product');
 import DropDownPicker from 'react-native-dropdown-picker';
+//import LoadData from '../../../data/product';
 
 const ProductList = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
+  const [userData2, setUserData2] = useState('');
   const [lastDocument, setLastDocument] = useState();
   const [productNum, setProductNum] = useState(0);
   const [open, setOpen] = useState(false);
@@ -40,21 +42,6 @@ const ProductList = ({ navigation }) => {
     return joinArray;
   }
 
-  const LoadData = useCallback(() => {
-    let query = userCollection.orderBy('price', value); //.where('color', 'in', ['Casper', 'red']);
-    if (lastDocument !== undefined) {
-      query = query.startAfter(lastDocument); // fetch data following the last document accessed
-    }
-    query
-      //.limit(3)
-      .get()
-      .then(querySnapshot => {
-        setLastDocument(querySnapshot.docs[querySnapshot.docs.length]);
-        MakeUserData(querySnapshot.docs);
-        //func();
-      });
-  }, [MakeUserData, lastDocument, value]);
-
   const reverseProductName = useCallback(
     doc => {
       userCollection.doc(doc.id).update({
@@ -79,6 +66,22 @@ const ProductList = ({ navigation }) => {
     [LoadData],
   );
   const [modalVisible, setModalVisible] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+
+  const LoadData = useCallback(() => {
+    let query = userCollection.orderBy('price', value); //.where('color', 'in', ['Casper', 'red']);
+    if (lastDocument !== undefined) {
+      query = query.startAfter(lastDocument); // fetch data following the last document accessed
+    }
+    query
+      //.limit(3)
+      .get()
+      .then(querySnapshot => {
+        setLastDocument(querySnapshot.docs[querySnapshot.docs.length]);
+        MakeUserData(querySnapshot.docs);
+        //func();
+      });
+  }, [MakeUserData, lastDocument, value]);
 
   const MakeUserData = useCallback(
     docs => {
@@ -92,8 +95,9 @@ const ProductList = ({ navigation }) => {
                 reverseProductName(doc);
               }}
               onPress={() => {
-                //setModalVisible(true);
-                console.log('Go to details page.');
+                setProductNum(i);
+                setModal2Visible(true);
+                setUserData2(doc._data.description);
               }}>
               <Image
                 style={styles.imgStyle}
@@ -150,6 +154,30 @@ const ProductList = ({ navigation }) => {
       <ScrollView>
         <View style={styles.products}>{userData}</View>
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modal2Visible}
+        onRequestClose={() => {
+          setModal2Visible(!modal2Visible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Pressable style={[styles.button]}>
+              <Text style={styles.descriptionStyle}>
+                Description: {userData2}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                setModal2Visible(!modal2Visible);
+              }}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         animationType="slide"
@@ -264,6 +292,10 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  descriptionStyle: {
+    color: 'black',
+    fontSize: 20,
   },
 });
 export default ProductList;

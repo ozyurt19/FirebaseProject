@@ -1,4 +1,4 @@
-import * as React from 'react'; //functionları ve firebase olayin data kisminda tutmak, modalin disina basinca kapanma, details page, modala daha cok secenek ekleme
+import * as React from 'react'; //functionları ve firebase olayin data kisminda tutmak, modalin disina basinca kapanma, modala daha cok secenek ekleme
 /*https://invertase.io/blog/getting-started-with-cloud-firestore-on-react-native */
 import { NavigationContainer } from '@react-navigation/native';
 //import { createNativeStackNavigator } from '@react-navigation/native-stack';

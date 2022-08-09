@@ -28,13 +28,14 @@ const AddProduct = props => {
   } = useForm();
 
   const onSubmit = data => {
-    //console.log(data);
+    console.log('deneme');
     userCollection.add({
       brand: data.brand,
       name: data.name,
       color: data.color,
       price: parseInt(data.price, 10),
       imgUrl: data.imgUrl,
+      description: data.description,
     });
     // eslint-disable-next-line no-alert
     alert('Product has been added.');
@@ -44,6 +45,7 @@ const AddProduct = props => {
       color: 'Select an item',
       price: '',
       imgUrl: '',
+      description: '',
     });
   };
   return (
@@ -131,6 +133,30 @@ const AddProduct = props => {
         name="imgUrl"
         rules={{ required: true }}
       />
+      <Text style={styles.label}>Description</Text>
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="explain its purpose and give information about your product"
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              backgroundColor: 'white',
+              borderColor: 'none',
+              padding: 10,
+              borderRadius: 4,
+              height: 80,
+              textAlignVertical: 'top',
+            }}
+            multiline={true}
+            onBlur={onBlur}
+            onChangeText={valuea => onChange(valuea)}
+            value={value}
+          />
+        )}
+        name="description"
+        rules={{ required: true }}
+      />
 
       <View style={styles.button}>
         <Button
@@ -144,6 +170,7 @@ const AddProduct = props => {
               color: 'Select an item',
               price: '',
               imgUrl: '',
+              description: '',
             });
           }}
         />
@@ -169,11 +196,11 @@ const styles = StyleSheet.create({
   },
   label: {
     color: 'black',
-    margin: 20,
+    margin: 10,
     marginLeft: 0,
   },
   button: {
-    marginTop: 40,
+    marginTop: 20,
     color: 'white',
     height: 40,
     backgroundColor: '#AAB8C2',
