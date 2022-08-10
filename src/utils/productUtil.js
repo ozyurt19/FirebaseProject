@@ -27,15 +27,15 @@ const deleteProduct = async (num, val) => {
   const querySnapshot = await userCollection.orderBy('price', val).get();
   const docum = querySnapshot.docs[num];
 
-  await userCollection.doc(docum?.id).delete();
+  await userCollection.doc(docum.id).delete();
 
   // eslint-disable-next-line no-alert
   alert('Product deleted!');
 };
 
 const reverseProductName = doc => {
-  userCollection.doc(doc?.id).update({
-    brand: reverseString(doc?._data?.brand),
+  userCollection.doc(doc.id).update({
+    brand: reverseString(doc._data.brand),
   });
   //loaddata cagiriyoduk render ediyodu
 };

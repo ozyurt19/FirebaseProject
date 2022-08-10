@@ -13,6 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		14059DB0289411D800CF5FBD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 14059DAF289411D800CF5FBD /* GoogleService-Info.plist */; };
 		14059DB1289411D800CF5FBD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 14059DAF289411D800CF5FBD /* GoogleService-Info.plist */; };
+		14CDA13D28A3C4790025324D /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		E2E7AB92D56CC7EC673BDA30 /* Pods_FirebaseProject_FirebaseProjectTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCAA7548A05B18C03BDB01 /* Pods_FirebaseProject_FirebaseProjectTests.framework */; };
 		E75A5E708A38A35241DD5001 /* Pods_FirebaseProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C2722CE8D3DBC6933CF8304 /* Pods_FirebaseProject.framework */; };
@@ -62,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14CDA13D28A3C4790025324D /* JavaScriptCore.framework in Frameworks */,
 				E75A5E708A38A35241DD5001 /* Pods_FirebaseProject.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,6 +478,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FirebaseProject/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -487,6 +490,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = FirebaseProject;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -501,6 +505,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = FirebaseProject/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -512,6 +517,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = FirebaseProject;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
