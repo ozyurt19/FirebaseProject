@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Text,
@@ -21,9 +22,9 @@ const ProductList = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [lastDocument, setLastDocument] = useState();
+  const [productNum, setProductNum] = useState([]);
   const [userData, setUserData] = useState([]);
   const [userData2, setUserData2] = useState('');
-  const [productNum, setProductNum] = useState(0);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('asc');
   const [items, setItems] = useState([
@@ -31,11 +32,11 @@ const ProductList = ({ navigation }) => {
     { label: 'Decreasing order of price', value: 'desc' },
   ]);
 
-  const load = useCallback(async () => {
+  const load = async () => {
     const { last, docs } = await LoadData(value, lastDocument);
     setLastDocument(last);
     MakeUserData(docs);
-  }, [MakeUserData, lastDocument, value]);
+  };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -45,9 +46,9 @@ const ProductList = ({ navigation }) => {
     });
     load();
     return unsubscribe;
-  }, [MakeUserData, lastDocument, load, navigation, value, userData]);
+  }, [lastDocument, navigation, value, userData]);
 
-  const MakeUserData = useCallback(docs => {
+  const MakeUserData = docs => {
     let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
     docs.forEach((doc, i) => {
       if (!doc) {
@@ -58,7 +59,7 @@ const ProductList = ({ navigation }) => {
           <TouchableOpacity
             onLongPress={() => reverseProductName(doc)}
             onPress={() => {
-              setProductNum(i);
+              //setProductNum(i);
               setModal2Visible(true);
               setUserData2(doc._data.description);
             }}>
@@ -72,30 +73,61 @@ const ProductList = ({ navigation }) => {
               {doc._data.brand} {doc._data.name} {doc._data.color}
             </Text>
           </TouchableOpacity>
-          <Pressable
-            style={[styles.button, styles.buttonOpen]}
-            onPress={() => {
-              setProductNum(i);
-              setModalVisible(true);
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
             }}>
-            <Text
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                color: 'white',
-                fontSize: 12,
-                fontWeight: 'bold',
-                textAlign: 'center',
+            <Pressable
+              style={styles.buttonCart}
+              onPress={() => {
+                let tmp = [...productNum].concat([i]);
+                setProductNum(tmp);
+                console.log(
+                  'tmp=',
+                  [...productNum, i],
+                  'product num=',
+                  productNum,
+                  'type=',
+                  typeof productNum,
+                );
               }}>
-              ...
-            </Text>
-          </Pressable>
+              <Text
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                Add to Cart
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonOpen]}
+              onPress={() => {
+                //setProductNum(i);
+                setModalVisible(true);
+              }}>
+              <Text
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                ...
+              </Text>
+            </Pressable>
+          </View>
           <Text>{doc._data.price} TRY</Text>
         </View>
       );
       templist.push(temp);
     });
     setUserData(templist); //replace with the new data
-  }, []);
+  };
 
   const onPressDeleteProduct = async () => {
     await deleteProduct(productNum, value);
@@ -124,6 +156,25 @@ const ProductList = ({ navigation }) => {
       <ScrollView>
         <View style={styles.products}>{userData}</View>
       </ScrollView>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('Cart', {
+            productNums: productNum,
+            setProductNums: setProductNum,
+          });
+        }}>
+        <View
+          style={{
+            //width: '40%',
+            //height: '10%',
+            alignSelf: 'center',
+            //height: 20,
+            //backgroundColor: 'blue',
+            //borderRadius: 4,
+          }}>
+          <Text>Go to Cart{productNum.length}</Text>
+        </View>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -259,6 +310,14 @@ const styles = StyleSheet.create({
   descriptionStyle: {
     color: 'black',
     fontSize: 20,
+  },
+  buttonCart: {
+    width: '80%',
+    backgroundColor: '#14171A',
+    borderRadius: 3,
+    margin: 2,
+    alignSelf: 'flex-end',
+    elevation: 2,
   },
 });
 export default ProductList;

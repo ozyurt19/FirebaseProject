@@ -8,26 +8,8 @@ install! 'cocoapods', :deterministic_uuids => false
 production = ENV["PRODUCTION"] == "1"
 
 target 'FirebaseProject' do
-  $static_frameworks = [
-  'react-native-mmkv-storage'
-]
-
-# Pre install that looks through a list of static frameworks
-pre_install do |installer|
-  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
-
-  installer.pod_targets.each do |target|
-    if $static_frameworks.include?(target.name)
-      puts "Overriding the static_framework method for #{target.name}"
-      def target.build_type;
-        Pod::BuildType.static_library
-      end
-    end
-  end
-end
   use_frameworks!
   config = use_native_modules!
-  pod 'RNFBAuth', :path => '../node_modules/@react-native-firebase/auth'
 
   # Flags change depending on the env values.
   flags = get_default_flags()
@@ -36,7 +18,7 @@ end
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
     :production => production,
-    :hermes_enabled => flags[:hermes_enabled],
+    :hermes_enabled => true,
     :fabric_enabled => flags[:fabric_enabled],
     
     # An absolute path to your application root.
