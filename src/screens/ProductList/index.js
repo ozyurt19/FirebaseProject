@@ -1,5 +1,6 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -17,12 +18,14 @@ import {
   reverseProductName,
   LoadData,
 } from '../../utils/productUtil';
+import { AppContext } from '../../../App';
 
 const ProductList = ({ navigation }) => {
+  const { productNum, setProductNum } = useContext(AppContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [lastDocument, setLastDocument] = useState();
-  const [productNum, setProductNum] = useState([]);
+  const [productToDelete, setProductToDelete] = useState([]);
   const [userData, setUserData] = useState([]);
   const [userData2, setUserData2] = useState('');
   const [open, setOpen] = useState(false);
@@ -59,7 +62,7 @@ const ProductList = ({ navigation }) => {
           <TouchableOpacity
             onLongPress={() => reverseProductName(doc)}
             onPress={() => {
-              //setProductNum(i);
+              setProductToDelete(i);
               setModal2Visible(true);
               setUserData2(doc._data.description);
             }}>
@@ -83,17 +86,8 @@ const ProductList = ({ navigation }) => {
               onPress={() => {
                 let tmp = [...productNum].concat([i]);
                 setProductNum(tmp);
-                console.log(
-                  'tmp=',
-                  [...productNum, i],
-                  'product num=',
-                  productNum,
-                  'type=',
-                  typeof productNum,
-                );
               }}>
               <Text
-                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   color: 'white',
                   fontSize: 12,
@@ -106,11 +100,10 @@ const ProductList = ({ navigation }) => {
             <Pressable
               style={[styles.button, styles.buttonOpen]}
               onPress={() => {
-                //setProductNum(i);
+                setProductToDelete(i);
                 setModalVisible(true);
               }}>
               <Text
-                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   color: 'white',
                   fontSize: 12,
@@ -130,7 +123,7 @@ const ProductList = ({ navigation }) => {
   };
 
   const onPressDeleteProduct = async () => {
-    await deleteProduct(productNum, value);
+    await deleteProduct(productToDelete, value);
     const { last, docs } = await LoadData(value, lastDocument);
     setLastDocument(last);
     MakeUserData(docs);
@@ -141,7 +134,6 @@ const ProductList = ({ navigation }) => {
   return (
     <View style={styles.main}>
       <DropDownPicker
-        // eslint-disable-next-line react-native/no-inline-styles
         style={{ backgroundColor: '#E1E8ED', borderWidth: 0 }}
         containerStyle={styles.dropDown}
         open={open}
@@ -150,7 +142,6 @@ const ProductList = ({ navigation }) => {
         setOpen={setOpen}
         setValue={setValue}
         setItems={setItems}
-        // eslint-disable-next-line react-native/no-inline-styles
         dropDownContainerStyle={{ borderWidth: 0 }}
       />
       <ScrollView>
@@ -158,20 +149,9 @@ const ProductList = ({ navigation }) => {
       </ScrollView>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('Cart', {
-            productNums: productNum,
-            setProductNums: setProductNum,
-          });
+          navigation.navigate('Cart');
         }}>
-        <View
-          style={{
-            //width: '40%',
-            //height: '10%',
-            alignSelf: 'center',
-            //height: 20,
-            //backgroundColor: 'blue',
-            //borderRadius: 4,
-          }}>
+        <View style={{ alignSelf: 'center' }}>
           <Text>Go to Cart{productNum.length}</Text>
         </View>
       </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 //import { getItem } from '../../storage/mmkv';
 import {
   View,
@@ -10,25 +10,19 @@ import {
   Modal,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import {
-  deleteProduct,
-  reverseProductName,
-  LoadData,
-} from '../../utils/productUtil';
+import { reverseProductName, LoadData } from '../../utils/productUtil';
 //import getProductNum from '../ProductList';
+import { AppContext } from '../../../App';
 
-const Cart = ({ navigation, route }) => {
+const Cart = ({ navigation }) => {
+  const { productNum, setProductNum } = useContext(AppContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [lastDocument, setLastDocument] = useState();
   const [userData, setUserData] = useState([]);
   const [deleteNum, setDeleteNum] = useState(-1);
   const [userData2, setUserData2] = useState('');
-  const [value, setValue] = useState('asc');
-  const [items, setItems] = useState([
-    { label: 'Increasing order of price', value: 'asc' },
-    { label: 'Decreasing order of price', value: 'desc' },
-  ]);
+  const [value] = useState('asc');
 
   const load = async () => {
     const { last, docs } = await LoadData(value, lastDocument);
@@ -45,7 +39,7 @@ const Cart = ({ navigation, route }) => {
     load();
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastDocument, navigation, value, userData]);
+  }, [navigation, userData]);
 
   const MakeUserData = docs => {
     let templist = []; //[...userData] <- use this instead of [] if you want to save the previous data.
@@ -53,9 +47,7 @@ const Cart = ({ navigation, route }) => {
       if (!doc) {
         return null;
       }
-      const productsInCart = route.params.productNums?.filter(
-        element => element === i,
-      );
+      const productsInCart = productNum?.filter(element => element === i);
       if (productsInCart.length > 0) {
         //getproductnum productlist pasgeden bir array alsin
         let temp = (
@@ -63,9 +55,8 @@ const Cart = ({ navigation, route }) => {
             <TouchableOpacity
               onLongPress={() => reverseProductName(doc)}
               onPress={() => {
-                //setProductNum(i);
                 setModal2Visible(true);
-                //setUserData2(doc._data.description);
+                setUserData2(doc._data.description);
               }}>
               <Image
                 style={styles.imgStyle}
@@ -78,6 +69,7 @@ const Cart = ({ navigation, route }) => {
               </Text>
             </TouchableOpacity>
             <View
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{
                 flexDirection: 'column',
                 width: '100%',
@@ -85,7 +77,6 @@ const Cart = ({ navigation, route }) => {
               <Pressable
                 style={[styles.button, styles.buttonOpen]}
                 onPress={() => {
-                  //setProductNum(i);
                   setDeleteNum(i);
                   setModalVisible(true);
                 }}>
@@ -101,7 +92,10 @@ const Cart = ({ navigation, route }) => {
                 </Text>
               </Pressable>
             </View>
-            <Text>{doc._data.price} TRY</Text>
+            <Text>
+              {doc._data.price} TRY x {productsInCart.length} ={'\n'}
+              {doc._data.price * productsInCart.length} TRY
+            </Text>
           </View>
         );
         templist.push(temp);
@@ -111,31 +105,13 @@ const Cart = ({ navigation, route }) => {
   };
 
   const discardFromCart = async i => {
-    //await deleteProduct(productNum, value);
-    let tmp = [...route.params.productNums]?.filter(
-      element => element !== deleteNum,
-    );
-    console.log('type=', typeof tmp);
-    console.log('tmp=', tmp);
-    route.params.productNums = tmp;
-    route.params.setProductNums(tmp);
+    let tmp = [...productNum]?.filter(element => element !== deleteNum);
+    setProductNum(tmp);
     const { last, docs } = await LoadData(value, lastDocument);
     setLastDocument(last);
     MakeUserData(docs);
-    console.log('DELETE ', deleteNum);
     setModalVisible(!modalVisible);
   };
-  //const [data, setData] = useState([]);
-  /*
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const newData = JSON.parse(getItem('keyy'));
-      console.log(typeof newData);
-      //setData(newData);
-    });
-    return unsubscribe;
-  }, [navigation]);
-*/
   return (
     <View style={styles.main}>
       <Modal
@@ -277,17 +253,13 @@ const styles = StyleSheet.create({
   },
 });
 export default Cart;
-
-/*<DropDownPicker
-        // eslint-disable-next-line react-native/no-inline-styles
-        style={{ backgroundColor: '#E1E8ED', borderWidth: 0 }}
-        containerStyle={styles.dropDown}
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setValue}
-        setItems={setItems}
-        // eslint-disable-next-line react-native/no-inline-styles
-        dropDownContainerStyle={{ borderWidth: 0 }}
-      /> */
+/*
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const newData = JSON.parse(getItem('keyy'));
+      console.log(typeof newData);
+      //setData(newData);
+    });
+    return unsubscribe;
+  }, [navigation]);
+*/
