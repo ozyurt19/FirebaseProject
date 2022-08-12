@@ -1,16 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Modal,
-  Pressable,
-} from 'react-native';
-
+import { Text, View, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {
@@ -19,6 +10,8 @@ import {
   LoadData,
 } from '../../utils/productUtil';
 import { AppContext } from '../../../App';
+import { UserDataList } from '../../components/userDataList';
+import styles from './styles';
 
 const ProductList = ({ navigation }) => {
   const { productNum, setProductNum } = useContext(AppContext);
@@ -58,64 +51,18 @@ const ProductList = ({ navigation }) => {
         return null;
       }
       let temp = (
-        <View key={i} style={styles.product}>
-          <TouchableOpacity
-            onLongPress={() => reverseProductName(doc)}
-            onPress={() => {
-              setProductToDelete(i);
-              setModal2Visible(true);
-              setUserData2(doc._data.description);
-            }}>
-            <Image
-              style={styles.imgStyle}
-              source={{
-                uri: doc._data.imgUrl,
-              }}
-            />
-            <Text>
-              {doc._data.brand} {doc._data.name} {doc._data.color}
-            </Text>
-          </TouchableOpacity>
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-            }}>
-            <Pressable
-              style={styles.buttonCart}
-              onPress={() => {
-                let tmp = [...productNum].concat([i]);
-                setProductNum(tmp);
-              }}>
-              <Text
-                style={{
-                  color: 'white',
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                Add to Cart
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.button, styles.buttonOpen]}
-              onPress={() => {
-                setProductToDelete(i);
-                setModalVisible(true);
-              }}>
-              <Text
-                style={{
-                  color: 'white',
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}>
-                ...
-              </Text>
-            </Pressable>
-          </View>
-          <Text>{doc._data.price} TRY</Text>
-        </View>
+        <UserDataList
+          key={i}
+          doc={doc}
+          i={i}
+          reverseProductName={reverseProductName}
+          setModal2Visible={setModal2Visible}
+          setUserData2={setUserData2}
+          setProductToDelete={setProductToDelete}
+          setModalVisible={setModalVisible}
+          setProductNum={setProductNum}
+          productNum={productNum}
+        />
       );
       templist.push(temp);
     });
@@ -209,97 +156,6 @@ const ProductList = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-    paddingTop: 10,
-    paddingHorizontal: 14,
-    paddingBottom: 70,
-    backgroundColor: '#F5F8FA',
-  },
-  product: {
-    paddingHorizontal: 8,
-    paddingBottom: 5,
-    margin: 3,
-    width: '48%',
-    backgroundColor: '#E1E8ED',
-    borderRadius: 2,
-  },
-  products: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  imgStyle: {
-    width: '110%',
-    aspectRatio: 1,
-    alignSelf: 'center',
-  },
-  dropDown: {
-    width: '60%',
-    alignSelf: 'flex-end',
-    paddingBottom: 10,
-    borderWidth: 0,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    marginTop: 570,
-    backgroundColor: '#E1E8ED',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'flex-end',
-    shadowColor: '#14171A',
-    shadowOffset: {
-      width: 2,
-      height: 4,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 3,
-    padding: 2,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#14171A',
-    borderRadius: 3,
-    padding: 2,
-    width: '16%',
-    alignSelf: 'flex-end',
-  },
-  buttonClose: {
-    backgroundColor: '#657786',
-    margin: 15,
-  },
-  textStyle: {
-    color: 'white',
-    fontSize: 25,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  descriptionStyle: {
-    color: 'black',
-    fontSize: 20,
-  },
-  buttonCart: {
-    width: '80%',
-    backgroundColor: '#14171A',
-    borderRadius: 3,
-    margin: 2,
-    alignSelf: 'flex-end',
-    elevation: 2,
-  },
-});
 export default ProductList;
 //style={{ color: doc._data.color.trim() }}
 /*
